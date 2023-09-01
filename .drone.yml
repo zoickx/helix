@@ -5,12 +5,13 @@ name: default
 
 steps:
   - name: rebuild-cache
-    image: docker:git
+    image: codeminders/drone-helper
+    pull: never
+    commands:
+      - drone-helper cache --deps="Dockerfile helix.opam"
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
-    commands:
-      - ./entrypoint.sh cache --deps="Dockerfile helix.opam"
 
   - name: test-cache
     image: cache--${DRONE_REPO}:${DRONE_COMMIT_AFTER}
@@ -19,9 +20,10 @@ steps:
       - cat /test.txt
 
   - name: test-notifications
-    image: alpine/git
+    image: codeminders/drone-helper
+    pull: never
     commands:
-      - ./entrypoint.sh notify --discord
+      - drone-helper notify --discord
     environment:
       DISCORD_WEBHOOK_TOKEN:
         from_secret: test_discord_token
