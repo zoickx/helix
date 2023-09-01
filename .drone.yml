@@ -19,8 +19,7 @@ steps:
       - cat /test.txt
 
   - name: test-notifications
-    image: alpine
-    pull: never
+    image: alpine/git
     commands:
       - ./entrypoint.sh notify --discord
     environment:
