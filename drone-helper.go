@@ -23,7 +23,7 @@ const colorUnknown = "0x808080"
 // (plainer and richer options available, depending on service)
 var mdTmpl = template.Must(template.New("markdown-message").Parse(
 	`**Build [#{{.BuildNumber}}]({{.BuildLink}})**
-**of [{{.Repo}}]({{.RepoLink}}):{{.Branch}}@[{{.CommitAfter}}]({{.CommitLink}})**
+**of [{{.Repo}}]({{.RepoLink}}):{{.Branch}}@[{{slice .CommitAfter 0 7}}]({{.CommitLink}})**
 **by {{.Author}}**
 **{{.Status}}**
 `))
