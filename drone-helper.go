@@ -221,7 +221,10 @@ func notifyDiscord() {
 
 	discordURL := fmt.Sprintf("discord://%s@%s?color=%s&splitLines=false", discordToken, discordID, color)
 
-	shoutrrr.Send(discordURL, message)
+	fmt.Printf("Sending message to Discord:\n%s\n", message)
+	err := shoutrrr.Send(discordURL, message)
+	checkErrorFatal(err)
+	fmt.Println("Message sent.")
 
 }
 
