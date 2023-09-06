@@ -3,7 +3,17 @@ kind: pipeline
 type: docker
 name: default
 
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
 steps:
+  - name: submodules
+    image: alpine/git
+    commands:
+      - git submodule update --init --recursive
+
   - name: rebuild-cache
     image: zoickx/drone-helper
     commands:
@@ -12,46 +22,26 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
 
-  - name: test-cache
+  - name: build-vellvm
     image: cache--${DRONE_REPO}:${DRONE_COMMIT_AFTER}
     pull: never
     commands:
-      - cat /test.txt
+      - opam exec -- make -j 1 vellvm
 
-  - name: test-notifications
+  - name: compile-helix
+    image: cache--${DRONE_REPO}:${DRONE_COMMIT_AFTER}
+    pull: never
+    commands:
+      - opam exec -- make
+
+  - name: test-helix
+    image: cache--${DRONE_REPO}:${DRONE_COMMIT_AFTER}
+    pull: never
+    commands:
+      - opam exec -- make test
+
+  - name: notify
     image: zoickx/drone-helper
     commands:
       - drone-helper notify --discord
-    environment:
-      DISCORD_WEBHOOK_TOKEN:
-        from_secret: test_discord_token
-      DISCORD_WEBHOOK_ID:
-        from_secret: test_discord_id
 
-#  - name: submodules
-#    image: alpine/git
-#    commands:
-#      - git submodule update --init --recursive
-#
-#  - name: build-vellvm
-#    image: cache--${DRONE_REPO_NAME}:${DRONE_SOURCE_BRANCH}
-#    pull: never
-#    commands:
-#      - opam exec -- make -j 1 vellvm
-#
-#  - name: compile-helix
-#    image: cache--${DRONE_REPO_NAME}:${DRONE_SOURCE_BRANCH}
-#    pull: never
-#    commands:
-#      - opam exec -- make
-#
-#  - name: test-helix
-#    image: cache--${DRONE_REPO_NAME}:${DRONE_SOURCE_BRANCH}
-#    pull: never
-#    commands:
-#      - opam exec -- make test
-
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
