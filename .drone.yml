@@ -5,8 +5,7 @@ name: default
 
 steps:
   - name: rebuild-cache
-    image: codeminders/drone-helper
-    pull: never
+    image: zoickx/drone-helper
     commands:
       - drone-helper cache --deps="Dockerfile helix.opam"
     volumes:
@@ -20,8 +19,7 @@ steps:
       - cat /test.txt
 
   - name: test-notifications
-    image: codeminders/drone-helper
-    pull: never
+    image: zoickx/drone-helper
     commands:
       - drone-helper notify --discord
     environment:
